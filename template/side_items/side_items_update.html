@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Shoes</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center mb-5">Edit Shoes</h1>
+
+      <button id="getSide_itemById" class="btn btn-primary">Get Side item By ID</button>
+      <form id="editSide_itemForm">
+        <input type="hidden" id="editSide_itemId" name="id" />
+
+        <div class="input-group mb-3">
+          <label for="editSide_itemName" class="input-group-text"
+            >New Shoes Name</label
+          >
+          <input
+            type="text"
+            id="editSide_itemName"
+            name="name"
+            class="form-control"
+          />
+        </div>
+
+        <div class="input-group mb-3">
+          <label for="editSide_itemSoluong" class="input-group-text">New So luong</label>
+          <input
+            type="number"
+            id="editSide_itemSoluong"
+            name="soluong"
+            class="form-control"
+          />
+        </div>
+
+        <!-- <div class="mb-3">
+          <label for="newSide_itemAuthor" class="form-label">Author</label>
+          <select id="newSide_itemAuthor" class="form-control"></select>
+        </div> -->
+
+        <button type="submit" class="btn btn-primary">Update Shoes</button>
+      </form>
+
+      <div id="updatedSide_item" class="mt-3"></div>
+
+      <form action="./side_items_list.html">
+        <button type="submit" class="btn btn-primary">Back Side_item List</button>
+      </form>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        // Add event listener for the form submission
+        $("#editSide_itemForm").submit(editSide_item);
+      });
+
+      // window.onload = async function () {
+      //   await getAuthors().then(populateAuthorDropdown);
+      // };
+
+      // async function getAuthors() {
+      //   const response = await $.ajax({
+      //     url: "http://localhost:3000/authors/",
+      //     method: "GET",
+      //   });
+      //   return response;
+      // }
+
+      // function populateAuthorDropdown(authors) {
+      //   const authorSelect = $("#newSide_itemAuthor");
+      //   authorSelect.empty();
+      //   authors.forEach((author) => {
+      //     const option = $("<option></option>")
+      //       .val(author._id)
+      //       .text(author.name);
+      //     authorSelect.append(option);
+      //   });
+      // }
+
+      // Function to edit a shoes
+      async function editSide_item(event) {
+        event.preventDefault();
+        const id = $("#editSide_itemId").val();
+        const name = $("#editSide_itemName").val();
+        const soluong = $("#editSide_itemSoluong").val();
+        // //const author = $("#editSide_itemAuthor").val();
+        // const authorSelect = $("#newSide_itemAuthor");
+        // const authorId = authorSelect.val();
+        // const authorIdString = String(authorId);
+
+        try {
+          const response = await $.ajax({
+            url: `http://localhost:3000/side_items/${id}`,
+            method: "PUT",
+            data: { name, soluong },
+          });
+
+          $("#updatedSide_item").text(JSON.stringify(response, null, 2));
+          // Redirect to the page displaying all shoes
+          window.location.href = "Ssde_items_list.html";
+        } catch (error) {
+          console.error("Error editing Side_item:", error);
+        }
+      }
+
+      // Function to populate the form with the existing Side_item data
+      function populateForm(side_item) {
+        $("#editSide_itemId").val(side_item._id);
+        $("#editSide_itemName").val(side_item.name);
+        $("#editSide_itemSoluong").val(side_item.soluong);
+       
+      }
+
+      // Function to get a shoes by ID and populate the form
+      function getSide_itemById() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get("id");
+        console.log(id);
+
+        if (!id) {
+          alert("Missing side_item ID in URL");
+          return;
+        }
+
+        $.ajax({
+          url: `http://localhost:3000/side_items/${id}`,
+          method: "GET",
+        })
+          .then((side_item) => {
+            populateForm(side_item);
+          })
+          .catch((error) => {
+            console.error("Error getting side_item:", error);
+            alert("Error getting side_item");
+          });
+      }
+
+      // Add event listener for the "Get side_item By ID" button
+      $("#getSide_itemById").click(getSide_itemById);
+    </script>
+  </body>
+</html>

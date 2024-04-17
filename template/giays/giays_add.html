@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giays API</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center mb-5">Giays API</h1>
+
+      <h2 class="mb-3">Add New Shoes</h2>
+      <form id="addGiayForm">
+        <div class="mb-3">
+          <label for="newGiayName" class="form-label">Shoes Name</label>
+          <input type="text" id="newGiayName" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label for="newGiaySize" class="form-label">Size</label>
+          <input type="number" id="newGiaySize" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label for="newGiayAuthor" class="form-label">Author</label>
+          <select id="newGiayAuthor" class="form-control"></select>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Shoes</button>
+      </form>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        $("#addGiayForm").submit(addGiay);
+      });
+
+      window.onload = async function () {
+        await getAuthors().then(populateAuthorDropdown);
+      };
+
+      async function getAuthors() {
+        const response = await $.ajax({
+          url: "http://localhost:3000/authors/",
+          method: "GET",
+        });
+        return response;
+      }
+
+      function populateAuthorDropdown(authors) {
+        const authorSelect = $("#newGiayAuthor");
+        authorSelect.empty();
+        authors.forEach((author) => {
+          const option = $("<option></option>")
+            .val(author._id)
+            .text(author.name);
+          authorSelect.append(option);
+        });
+      }
+
+      // Function to add new shoes
+      async function addGiay(event) {
+        event.preventDefault();
+        const name = $("#newGiayName").val();
+        const size = $("#newGiaySize").val();
+        const authorSelect = $("#newGiayAuthor");
+        const authorId = authorSelect.val();
+        const authorIdString = String(authorId);
+
+        console.log(authorIdString);
+
+        try {
+          const response = await $.ajax({
+            url: "http://localhost:3000/giays/",
+            method: "POST",
+            data: { name, size, author: authorIdString },
+          });
+
+          $("#addedGiay").text(JSON.stringify(response, null, 2));
+          location.reload();
+        } catch (error) {
+          console.error("Error adding giay:", error);
+        }
+        window.location.href = "./giays_list.html";
+      }
+    </script>
+  </body>
+</html>

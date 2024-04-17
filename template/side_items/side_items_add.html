@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phu kien API</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center mb-5">Phu kien API</h1>
+
+      <h2 class="mb-3">Add New Side items</h2>
+      <form id="addSide_itemForm">
+        <div class="mb-3">
+          <label for="newSide_itemName" class="form-label">Side_item Name</label>
+          <input type="text" id="newSide_itemName" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label for="newSide_itemSoluong" class="form-label">So luong</label>
+          <input type="number" id="newSide_itemSoluong" class="form-control" />
+        </div>
+        <!-- <div class="mb-3">
+          <label for="newSide_itemAuthor" class="form-label">Author</label>
+          <select id="newSide_itemAuthor" class="form-control"></select>
+        </div> -->
+        <button type="submit" class="btn btn-primary">Add Side items</button>
+      </form>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        $("#addSide_itemForm").submit(addSide_item);
+      });
+
+      // window.onload = async function () {
+      //   await getAuthors().then(populateAuthorDropdown);
+      // };
+
+      // async function getAuthors() {
+      //   const response = await $.ajax({
+      //     url: "http://localhost:3000/authors/",
+      //     method: "GET",
+      //   });
+      //   return response;
+      // }
+
+      // function populateAuthorDropdown(authors) {
+      //   const authorSelect = $("#newSide_itemAuthor");
+      //   authorSelect.empty();
+      //   authors.forEach((author) => {
+      //     const option = $("<option></option>")
+      //       .val(author._id)
+      //       .text(author.name);
+      //     authorSelect.append(option);
+      //   });
+      // }
+
+      // Function to add new Side_item
+      async function addSide_item(event) {
+        event.preventDefault();
+        const name = $("#newSide_itemName").val();
+        const soluong = $("#newSide_itemSoluong").val();
+        // const authorSelect = $("#newSide_itemAuthor");
+        // const authorId = authorSelect.val();
+        // const authorIdString = String(authorId);
+
+        // console.log(authorIdString);
+
+        try {
+          const response = await $.ajax({
+            url: "http://localhost:3000/side_items/",
+            method: "POST",
+            data: { name, soluong },
+          });
+
+          $("#addedSide_item").text(JSON.stringify(response, null, 2));
+          location.reload();
+        } catch (error) {
+          console.error("Error adding side item:", error);
+        }
+        window.location.href = "./side_items_list.html";
+      }
+    </script>
+  </body>
+</html>

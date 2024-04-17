@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Side_item API</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center mb-5">Side items API</h1>
+
+      <h2 class="mb-3">Get All Side items</h2>
+
+      <div class="container mt-3">
+        <form action="./side_items_add.html">
+          <button type="submit" class="btn btn-primary">Add Side items</button>
+        </form>
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <th>Name</th>
+                <th>So luong</th>
+            
+              </tr>
+            </thead>
+            <tbody id="side_item-list"></tbody>
+          </table>
+        </div>
+        <!-- Add the pagination links here -->
+        <nav aria-label="Page navigation" class="d-flex justify-content-center">
+          <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+          </ul>
+        </nav>
+      </div>
+
+    <script>
+      $(document).ready(function () {
+        // Add event listeners for all buttons
+        //$("#getAllSide_items").click(getAllSide_items);
+        $("#getSide_itemById").click(getSide_itemById);
+        // $("#addSide_itemForm").submit(addSide_item);
+        $("#updateSide_item").click(updateSide_item);
+        // $("#deleteSide_item").click(deleteSide_item);
+      });
+
+      window.onload = async function () {
+        const limit = 4;
+        const page = 1;
+        getAllSide_items(limit, page);
+        //await getAllSide_items();
+        // await getAuthors().then(populateAuthorDropdown);
+      };
+
+      // Function to get all Side_item
+      async function getAllSide_items(limit, page) {
+        const response = await $.ajax({
+          url: `http://localhost:3000/side_items/?limit=${limit}&page=${page}`,
+          method: "GET",
+        });
+        const side_items = response;
+        console.log(side_items);
+        const side_itemList = document.getElementById("side_item-list");
+
+        side_itemList.innerHTML = ""; // Clear the Side_item list before adding new Side_item
+
+        side_items.forEach((side_item) => {
+          const row = document.createElement("tr");
+          const nameCell = document.createElement("td");
+          const soluongCell = document.createElement("td");
+          // const authorCell = document.createElement("td");
+          const deleteCell = document.createElement("td");
+          const deleteButton = document.createElement("button");
+          const updateCell = document.createElement("td");
+          const updateButton = document.createElement("button");
+
+          nameCell.textContent = side_item.name;
+          soluongCell.textContent = side_item.soluong;
+          deleteButton.textContent = "Delete";
+          deleteButton.className = "btn btn-danger";
+          updateButton.textContent = "Update";
+          updateButton.className = "btn btn-info";
+          // authorCell.textContent = side_item.author.name;
+
+          deleteButton.addEventListener("click", () => {
+            deleteSide_item(side_item._id);
+          });
+
+          updateButton.addEventListener("click", () => {
+            updateSide_item(side_item._id);
+          });
+
+          deleteCell.appendChild(deleteButton);
+          updateCell.appendChild(updateButton);
+          row.appendChild(nameCell);
+          row.appendChild(soluongCell);
+          row.appendChild(deleteCell);
+          row.appendChild(updateCell);
+          // row.appendChild(authorCell);
+
+          side_itemList.appendChild(row);
+        });
+      }
+
+      async function deleteSide_item(id) {
+        // Send a DELETE request to the server to delete the side_item with the given ID
+        await $.ajax({
+          url: `http://localhost:3000/side_items/${id}`,
+          method: "DELETE",
+        });
+
+        // Remove the row from the table
+        const rowToRemove = document.querySelector(`tr[data-side_item-id="${id}"]`);
+        if (rowToRemove) {
+          rowToRemove.remove();
+        }
+      }
+
+      const pageLinks = document.querySelectorAll(".pagination .page-link");
+      pageLinks.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const page = link.textContent;
+          getAllSide_items(4, page);
+        });
+      });
+
+      // Function to get Side_item by ID
+      async function getSide_itemById() {
+        const id = $("#side_itemId").val();
+        const response = await $.ajax({
+          url: `http://localhost:3000/side_items/${id}`,
+          method: "GET",
+        });
+        $("#side_itemById").text(JSON.stringify(response, null, 2));
+      }
+
+      // async function getAuthors() {
+      //   const response = await $.ajax({
+      //     url: "http://localhost:3000/authors/",
+      //     method: "GET",
+      //   });
+      //   return response;
+      // }
+
+      // function populateAuthorDropdown(authors) {
+      //   const authorSelect = $("#newSide_itemAuthor");
+      //   authorSelect.empty();
+      //   authors.forEach((author) => {
+      //     const option = $("<option></option>")
+      //       .val(author._id)
+      //       .text(author.name);
+      //     authorSelect.append(option);
+      //   });
+      // }
+
+      // Function to add new Side_item
+      async function addSide_item(event) {
+        event.preventDefault();
+        const name = $("#newSide_itemName").val();
+        const soluong = $("#newSide_itemSoluong").val();
+        // const authorSelect = $("#newSide_itemAuthor");
+        // const authorId = authorSelect.val();
+        // const authorIdString = String(authorId);
+
+        // console.log(authorIdString);
+
+        try {
+          const response = await $.ajax({
+            url: "http://localhost:3000/side_items/",
+            method: "POST",
+            data: { name, soluong },
+          });
+
+          $("#addedSide_item").text(JSON.stringify(response, null, 2));
+          location.reload();
+        } catch (error) {
+          console.error("Error adding side_item:", error);
+        }
+      }
+
+      // Function to update Side_item
+      // async function updateSide_item() {
+      //   const id = $("#updateSide_itemId").val();
+      //   const name = $("#updateSide_itemName").val();
+      //   const soluong = $("#updateSide_itemSoluong").val();
+      //   // const author = $("#updateSide_itemAuthor").val();
+      //   const response = await $.ajax({
+      //     url: `http://localhost:3000/side_items/${id}`,
+      //     method: "PUT",
+      //     data: { name, soluong},
+      //   });
+      //   $("#updatedSide_item").text(JSON.stringify(response, null, 2));
+      //   location.reload();
+      // }
+
+      // // Function to delete Side_item
+      // async function deleteSide_item() {
+      //   const id = $("#deleteSide_itemId").val();
+      //   const response = await $.ajax({
+      //     url: `http://localhost:3000/side_items/${id}`,
+      //     method: "DELETE",
+      //   });
+      //   $("#deletedSide_item").text(JSON.stringify(response, null, 2));
+      //   location.reload();
+      // }
+
+      // call the function to populate the dropdown list
+    </script>
+  </body>
+</html>
